@@ -28,7 +28,7 @@ RUN groupadd -g <GROUP_ID> <USERNAME> && \
 ONBUILD USER <USERNAME>
 
 ENV GOPATH /workspace
-ENV PATH $PATH:/go/bin
+ENV PATH $PATH:/go/bin:/workspace/bin
 
 VOLUME ["/workspace"]
 ENTRYPOINT ["/bin/bash"]
