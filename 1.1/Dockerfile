@@ -1,2 +1,2 @@
-FROM JustAdam/golang
+FROM justadam/golang
 
