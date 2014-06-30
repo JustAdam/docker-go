@@ -3,13 +3,13 @@
 #
 # Source code is kept outside of the container (accessed via a volume)
 #
-# Version 0.1
+# Version 0.1.1
 
-FROM ubuntu:13.10
+FROM ubuntu:14.04
 
 MAINTAINER JustAdam <adambell7@gmail.com>
 
-RUN echo "deb http://archive.ubuntu.com/ubuntu saucy main universe" > /etc/apt/sources.list
+RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" > /etc/apt/sources.list
 RUN apt-get update && \
     apt-get install -y make gcc libc6-dev git mercurial
 
