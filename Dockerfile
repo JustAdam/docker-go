@@ -30,5 +30,7 @@ ONBUILD USER <USERNAME>
 ENV GOPATH /workspace
 ENV PATH $PATH:/go/bin:/workspace/bin
 
+ONBUILD RUN /go/bin/go get code.google.com/p/go.tools/cmd/cover
+
 VOLUME ["/workspace"]
 ENTRYPOINT ["/bin/bash"]
