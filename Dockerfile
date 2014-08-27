@@ -11,6 +11,7 @@ MAINTAINER JustAdam <adambell7@gmail.com>
 
 RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" > /etc/apt/sources.list
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y make gcc libc6-dev git mercurial
 
 RUN echo "[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt" > /etc/mercurial/hgrc
