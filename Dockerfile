@@ -34,5 +34,7 @@ ENV PATH $PATH:/go/bin:/workspace/bin
 ONBUILD RUN /go/bin/go get code.google.com/p/go.tools/cmd/cover
 ONBUILD RUN /go/bin/go get code.google.com/p/go.tools/cmd/vet
 
+EXPOSE 12345
+
 VOLUME ["/workspace"]
 ENTRYPOINT ["/bin/bash"]
