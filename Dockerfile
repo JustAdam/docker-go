@@ -3,37 +3,50 @@
 #
 # Source code is kept outside of the container (accessed via a volume)
 #
-# Version 0.1.1
+# Version 0.1.2
 
 FROM ubuntu:14.04
 
 MAINTAINER JustAdam <adambell7@gmail.com>
 
+
 RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" > /etc/apt/sources.list
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y make gcc libc6-dev git mercurial
+    DEBIAN_FRONTEND=noninteractive apt-get install -y make gcc libc6-dev git mercurial
 
 RUN echo "[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt" > /etc/mercurial/hgrc
+
+# Package manage tools
+RUN git clone https://github.com/pote/gpm.git && \
+    cd gpm && \
+    DEBIAN_FRONTEND=noninteractive ./configure && \
+    DEBIAN_FRONTEND=noninteractive make install
+RUN git clone https://github.com/pote/gvp.git && \
+    cd gvp && \
+    DEBIAN_FRONTEND=noninteractive ./configure && \
+    DEBIAN_FRONTEND=noninteractive make install
 
 # Go version information (tag or branch name)
 ONBUILD ADD release release
 ONBUILD RUN hg clone -u $(cat release)  https://code.google.com/p/go && \
             cd go/src && \
-            ./make.bash
+            DEBIAN_FRONTEND=noninteractive ./make.bash
 
-# Add your username/group here, so when writing to /workspace from the container you still own the files.
-RUN groupadd -g <GROUP_ID> <USERNAME> && \
-    useradd -d /workspace -g <GROUP_ID> <USERNAME>
-# Permissions thing
-ONBUILD USER <USERNAME>
-
-ENV GOPATH /workspace
-ENV PATH $PATH:/go/bin:/workspace/bin
-
+# Other dev tools
 ONBUILD RUN /go/bin/go get code.google.com/p/go.tools/cmd/cover
 ONBUILD RUN /go/bin/go get code.google.com/p/go.tools/cmd/vet
 
+# Run as unknown user so hopefully you maintain ownership of any files that are created
+RUN groupadd -g 1000 golang && \
+    useradd -d /workspace -g 1000 golang
+# Permissions thing
+ONBUILD USER golang
+
+ENV PATH $PATH:/go/bin:/workspace/bin
+ENV GOPATH /workspace
+
+# Provide port for developing network listener apps
 EXPOSE 12345
 
 VOLUME ["/workspace"]
