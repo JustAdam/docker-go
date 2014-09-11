@@ -1,7 +1,7 @@
 Go from source Docker container
 ===============================
 
-Development in Go, using a Docker container.  Source code is kept on the host computer outside of the container.
+Development in Go, using a Docker container.  Source code is kept on the host computer outside of the container.  Package management provided by gpm + gvp.
 
 ```
 $ docker build -t justadam/golang .
@@ -15,7 +15,7 @@ $ docker build -t justadam/golang:1.3 .
 $ docker run -it --name go1.3 -v "/path/to/your/go/source/:/workspace:rw" justadam/golang:1.3
 ```
 
-### Get back into container:
+### Get back into the container:
 
 ```
 $ docker start -ia go1.3
