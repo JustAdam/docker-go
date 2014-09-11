@@ -17,7 +17,7 @@ RUN apt-get update && \
 
 RUN echo "[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt" > /etc/mercurial/hgrc
 
-# Package manage tools
+# Package management tools
 RUN git clone https://github.com/pote/gpm.git && \
     cd gpm && \
     DEBIAN_FRONTEND=noninteractive ./configure && \
@@ -29,6 +29,7 @@ RUN git clone https://github.com/pote/gvp.git && \
 
 # Go version information (tag or branch name)
 ONBUILD ADD release release
+# Clone and build repo
 ONBUILD RUN hg clone -u $(cat release)  https://code.google.com/p/go && \
             cd go/src && \
             DEBIAN_FRONTEND=noninteractive ./make.bash
