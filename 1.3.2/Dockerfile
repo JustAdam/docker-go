@@ -1,0 +1,2 @@
+FROM justadam/golang
+
