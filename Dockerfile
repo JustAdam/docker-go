@@ -9,11 +9,19 @@ FROM ubuntu:14.04
 
 MAINTAINER JustAdam <adambell7@gmail.com>
 
+RUN apt-get clean && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    apt-get clean
 
-RUN echo "deb http://archive.ubuntu.com/ubuntu trusty main universe" > /etc/apt/sources.list
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y make gcc libc6-dev git mercurial
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates make gcc libc6-dev git mercurial && \
+    apt-get clean
+
+ENV TIMEZONE Europe/Oslo
+RUN echo $TIMEZONE > /etc/timezone &&\
+  cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime &&\
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata
+
 
 RUN echo "[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt" > /etc/mercurial/hgrc
 
@@ -35,7 +43,7 @@ ONBUILD RUN hg clone -u $(cat release)  https://code.google.com/p/go && \
             DEBIAN_FRONTEND=noninteractive ./make.bash
 
 # Other dev tools
-ONBUILD RUN /go/bin/go get code.google.com/p/go.tools/cmd/cover
+ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/cover
 ONBUILD RUN /go/bin/go get code.google.com/p/go.tools/cmd/vet
 
 # Run as unknown user so hopefully you maintain ownership of any files that are created
@@ -43,6 +51,8 @@ RUN groupadd -g 1000 golang && \
     useradd -d /workspace -g 1000 golang
 # Permissions thing
 ONBUILD USER golang
+# http://talks.golang.org/2014/organizeio.slide#14
+ONBUILD RUN echo "gocd () { cd `/go/bin/go list -f '{{.Dir}}' $1` }" >> /etc/skel/.profile
 
 ENV PATH $PATH:/go/bin:/workspace/bin
 ENV GOPATH /workspace
