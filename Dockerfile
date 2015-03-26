@@ -36,23 +36,31 @@ RUN git clone https://github.com/pote/gvp.git && \
     DEBIAN_FRONTEND=noninteractive make install
 
 # Go version information (tag or branch name)
-ONBUILD ADD release release
+ONBUILD ADD release /release
 # Clone and build repo
-ONBUILD RUN hg clone -u $(cat release)  https://code.google.com/p/go && \
-            cd go/src && \
+ONBUILD RUN git clone https://go.googlesource.com/go && \
+            cd go && \
+            git checkout $(cat /release) && \
+            cd src && \
             DEBIAN_FRONTEND=noninteractive ./make.bash
 
 # Other dev tools
 ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/cover
-ONBUILD RUN /go/bin/go get code.google.com/p/go.tools/cmd/vet
+ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/vet 
+ONBUILD RUN /go/bin/go get github.com/golang/lint/golint
+ONBUILD RUN /go/bin/go get github.com/kisielk/errcheck
+ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/benchcmp
+ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/stringer
 
 # Run as unknown user so hopefully you maintain ownership of any files that are created
 RUN groupadd -g 1000 golang && \
     useradd -d /workspace -g 1000 golang
-# Permissions thing
-ONBUILD USER golang
+
 # http://talks.golang.org/2014/organizeio.slide#14
 ONBUILD RUN echo "gocd () { cd `/go/bin/go list -f '{{.Dir}}' $1` }" >> /etc/skel/.profile
+
+# Permissions thing
+ONBUILD USER golang
 
 ENV PATH $PATH:/go/bin:/workspace/bin
 ENV GOPATH /workspace
