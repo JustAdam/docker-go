@@ -5,7 +5,7 @@
 #
 # Version 0.1.2
 
-FROM ubuntu:14.04
+FROM ubuntu:14.10
 
 MAINTAINER JustAdam <adambell7@gmail.com>
 
@@ -22,18 +22,7 @@ RUN echo $TIMEZONE > /etc/timezone &&\
   cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime &&\
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata
 
-
 RUN echo "[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt" > /etc/mercurial/hgrc
-
-# Package management tools
-RUN git clone https://github.com/pote/gpm.git && \
-    cd gpm && \
-    DEBIAN_FRONTEND=noninteractive ./configure && \
-    DEBIAN_FRONTEND=noninteractive make install
-RUN git clone https://github.com/pote/gvp.git && \
-    cd gvp && \
-    DEBIAN_FRONTEND=noninteractive ./configure && \
-    DEBIAN_FRONTEND=noninteractive make install
 
 # Go version information (tag or branch name)
 ONBUILD ADD release /release
@@ -52,7 +41,10 @@ ONBUILD RUN /go/bin/go get github.com/kisielk/errcheck
 ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/benchcmp
 ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/stringer
 
-# Run as unknown user so hopefully you maintain ownership of any files that are created
+# Package management
+ONBUILD RUN /go/bin/go get github.com/constabulary/gb/...
+
+# Hopefully you are uid 1000 so we maintain ownership of any files that are created
 RUN groupadd -g 1000 golang && \
     useradd -d /workspace -g 1000 golang
 
@@ -69,4 +61,5 @@ ENV GOPATH /workspace
 EXPOSE 12345
 
 VOLUME ["/workspace"]
+WORKDIR /workspace
 ENTRYPOINT ["/bin/bash"]
