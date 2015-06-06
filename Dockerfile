@@ -54,12 +54,12 @@ ONBUILD RUN echo "gocd () { cd `/go/bin/go list -f '{{.Dir}}' $1` }" >> /etc/ske
 # Permissions thing
 ONBUILD USER golang
 
-ENV PATH $PATH:/go/bin:/workspace/bin
-ENV GOPATH /workspace
+ENV PATH $PATH:/go/bin:/workspace/bin:/gopath/bin
+RUN mkdir /gopath
+ENV GOPATH /gopath
 
 # Provide port for developing network listener apps
 EXPOSE 12345
 
 VOLUME ["/workspace"]
-WORKDIR /workspace
 ENTRYPOINT ["/bin/bash"]
