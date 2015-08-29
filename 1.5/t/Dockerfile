@@ -1,1 +1,0 @@
-FROM justadam/golang-onbuild
