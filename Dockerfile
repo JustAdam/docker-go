@@ -20,7 +20,7 @@ ONBUILD ENV GOROOT_BOOTSTRAP /go1.4/go/
 ONBUILD RUN apt-get clean && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y git wget gcc && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y git mercurial make wget gcc && \
     apt-get clean && \
     wget https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz && \
     mkdir go1.4 && \
@@ -33,7 +33,7 @@ ONBUILD RUN apt-get clean && \
     DEBIAN_FRONTEND=noninteractive ./make.bash && \
     rm -rf /go1.4
 
-#RUN 
+ONBUILD RUN echo "[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt" > /etc/mercurial/hgrc
 
 # Some dev tools
 ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/...
