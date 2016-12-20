@@ -3,14 +3,16 @@
 #
 # Source code is kept outside of the container and accessed via a volume.
 #
-# Version 0.1.3
+# Version 0.1.4
 #
 
-FROM ubuntu:15.04
+FROM ubuntu:16.04
 
 MAINTAINER JustAdam <adambell7@gmail.com>
 
+ENV PROTOCOL_BUFFERS_VERSION 3.1.0
 ENV TIMEZONE Europe/Oslo
+
 RUN echo $TIMEZONE > /etc/timezone &&\
     cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime &&\
     DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata
@@ -20,7 +22,7 @@ ONBUILD ENV GOROOT_BOOTSTRAP /go1.4/go/
 ONBUILD RUN apt-get clean && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y git mercurial make wget gcc && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y git mercurial make wget gcc unzip && \
     apt-get clean && \
     wget https://storage.googleapis.com/golang/go1.4.2.linux-amd64.tar.gz && \
     mkdir go1.4 && \
@@ -31,7 +33,15 @@ ONBUILD RUN apt-get clean && \
     git checkout $(cat /release) && \
     cd src && \
     DEBIAN_FRONTEND=noninteractive ./make.bash && \
-    rm -rf /go1.4
+    rm -rf /go1.4 && \
+    mkdir protoc && \
+    cd protoc && \
+    wget https://github.com/google/protobuf/releases/download/v${PROTOCOL_BUFFERS_VERSION}/protoc-${PROTOCOL_BUFFERS_VERSION}-linux-x86_64.zip && \
+    unzip protoc-${PROTOCOL_BUFFERS_VERSION}-linux-x86_64.zip && \
+    mv bin/protoc /usr/local/bin/protoc && \
+    chmod +x  /usr/local/bin/protoc && \
+    cd .. && \
+    rm -rf protoc
 
 ONBUILD RUN echo "[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt" > /etc/mercurial/hgrc
 
@@ -42,6 +52,9 @@ ONBUILD RUN /go/bin/go get github.com/kisielk/errcheck
 
 # Package management from gb
 ONBUILD RUN /go/bin/go get github.com/constabulary/gb/...
+
+# Go protocol buffer support
+ONBUILD RUN /go/bin/go get -u github.com/golang/protobuf/protoc-gen-go
 
 # Hopefully you are uid/gid 1000, so we maintain ownership of any files that are created
 RUN groupadd -g 1000 golang && \
@@ -54,6 +67,9 @@ ENV GOPATH /gopath
 
 # File permissions thing
 ONBUILD USER golang
+
+# Default vendoring support
+ONBUILD ENV GOPATH /gopath:/workspace
 
 VOLUME ["/workspace"]
 ENTRYPOINT ["/bin/bash"]
