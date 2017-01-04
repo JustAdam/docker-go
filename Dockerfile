@@ -51,6 +51,7 @@ ONBUILD RUN /go/bin/go get github.com/golang/lint/golint
 ONBUILD RUN /go/bin/go get github.com/kisielk/errcheck
 
 # Package management from gb
+ONBUILD RUN /go/bin/go get -u github.com/govend/govend
 ONBUILD RUN /go/bin/go get github.com/constabulary/gb/...
 
 # Go protocol buffer support
