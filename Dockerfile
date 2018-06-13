@@ -6,16 +6,11 @@
 # Version 0.1.4
 #
 
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 MAINTAINER JustAdam <adambell7@gmail.com>
 
-ENV PROTOCOL_BUFFERS_VERSION 3.1.0
-ENV TIMEZONE Europe/Oslo
-
-RUN echo $TIMEZONE > /etc/timezone &&\
-    cp /usr/share/zoneinfo/${TIMEZONE} /etc/localtime &&\
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure tzdata
+ENV PROTOCOL_BUFFERS_VERSION 3.5.1
 
 ONBUILD ADD release /release
 ONBUILD ENV GOROOT_BOOTSTRAP /go1.4/go/
@@ -49,6 +44,7 @@ ONBUILD RUN echo "[web]\ncacerts = /etc/ssl/certs/ca-certificates.crt" > /etc/me
 ONBUILD RUN /go/bin/go get golang.org/x/tools/cmd/...
 ONBUILD RUN /go/bin/go get github.com/golang/lint/golint
 ONBUILD RUN /go/bin/go get github.com/kisielk/errcheck
+ONBUILD RUN /go/bin/go get -u github.com/derekparker/delve/cmd/dlv
 
 # Package management stuff
 ONBUILD RUN /go/bin/go get -u github.com/govend/govend
